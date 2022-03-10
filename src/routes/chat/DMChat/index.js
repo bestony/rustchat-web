@@ -10,19 +10,12 @@ import { StyledHeader, StyledDMChat } from "./styled";
 export default function DMChat({ uid = "", dropFiles = [] }) {
   console.log("dm files", dropFiles);
   const [dragFiles, setDragFiles] = useState([]);
-  const contacts = useSelector((store) => store.contacts);
+  const currUser = useSelector((store) => store.contacts.byId[uid]);
   const { msgs } = useSelector((store) => {
     return {
       msgs: store.userMessage[uid] || {},
     };
   });
-  const [currUser, setCurrUser] = useState(null);
-  useEffect(() => {
-    console.log({ uid });
-    if (uid && contacts) {
-      setCurrUser(contacts.find((c) => c.uid == uid));
-    }
-  }, [uid, contacts]);
   useEffect(() => {
     if (dropFiles.length) {
       setDragFiles(dropFiles);

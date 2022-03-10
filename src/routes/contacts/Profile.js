@@ -51,15 +51,7 @@ const StyledWrapper = styled.div`
   }
 `;
 export default function Profile({ uid = null }) {
-  const contacts = useSelector((store) => store.contacts);
-  const [profile, setProfile] = useState(null);
-  useEffect(() => {
-    if (contacts && contacts) {
-      setProfile(contacts.find((c) => c.uid == uid));
-    } else {
-      setProfile(null);
-    }
-  }, [uid, contacts]);
+  const profile = useSelector((store) => store.contacts.byId[uid]);
   if (!profile) return null;
   console.log({ profile });
   const { name, email, avatar } = profile;

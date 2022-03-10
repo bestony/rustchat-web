@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import Message from "../../../common/component/Message";
 import ChannelIcon from "../../../common/component/ChannelIcon";
 import Send from "../../../common/component/Send";
-import { clearChannelMsgUnread } from "../../../app/slices/message.channel";
+import { setMsgRead } from "../../../app/slices/message";
 import Contact from "../../../common/component/Contact";
 import Layout from "../Layout";
 import {
@@ -25,14 +25,14 @@ export default function ChannelChat({
   // const containerRef = useRef(null);
   const [dragFiles, setDragFiles] = useState([]);
   const dispatch = useDispatch();
-  const { msgs, users } = useSelector((store) => {
+  const { msgs, userIds } = useSelector((store) => {
     return {
-      msgs: store.channelMessage[cid] || {},
-      users: store.contacts,
+      msgs: store.channelMessage[cid] || [],
+      userIds: store.contacts.ids,
     };
   });
   const handleClearUnreads = () => {
-    dispatch(clearChannelMsgUnread(cid));
+    dispatch(setMsgRead(msgs));
   };
   useEffect(() => {
     if (dropFiles.length) {
@@ -42,9 +42,9 @@ export default function ChannelChat({
   const { name, description, is_public, members = [] } = data;
   const filteredUsers =
     members.length == 0
-      ? users
-      : users.filter((u) => {
-          return members.includes(u.uid);
+      ? userIds
+      : userIds.filter((id) => {
+          return members.includes(id);
         });
   console.log("channel message list", msgs);
   return (
@@ -82,8 +82,8 @@ export default function ChannelChat({
       }
       contacts={
         <StyledContacts>
-          {filteredUsers.map(({ name, uid }) => {
-            return <Contact key={name} uid={uid} popover />;
+          {filteredUsers.map((uid) => {
+            return <Contact key={uid} uid={uid} popover />;
           })}
         </StyledContacts>
       }
@@ -96,42 +96,10 @@ export default function ChannelChat({
             {/* <button className="edit">Edit Channel</button> */}
           </div>
           <div className="chat">
-            {Object.entries(msgs)
-              .sort(([, msg1], [, msg2]) => {
-                return msg1.created_at - msg2.created_at;
-              })
-              .map(([mid, msg], idx) => {
-                if (!msg) return null;
-                const {
-                  likes = {},
-                  pending = false,
-                  from_uid,
-                  content,
-                  content_type,
-                  created_at,
-                  unread,
-                  removed = false,
-                  edited,
-                  reply,
-                } = msg;
-                return (
-                  <Message
-                    reply={reply}
-                    edited={edited}
-                    likes={likes}
-                    removed={removed}
-                    pending={pending}
-                    content_type={content_type}
-                    unread={unread}
-                    gid={cid}
-                    mid={mid}
-                    key={idx}
-                    time={created_at}
-                    fromUid={from_uid}
-                    content={content}
-                  />
-                );
-              })}
+            {msgs.map((mid, idx) => {
+              if (!mid) return null;
+              return <Message key={idx} mid={mid} />;
+            })}
           </div>
         </div>
 

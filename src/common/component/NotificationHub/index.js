@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import useNotification from "./useNotification";
-import BASE_URL from "../../../app/config";
+import BASE_URL, { KEY_USER_VERSION, KEY_AFTER_MID } from "../../../app/config";
 import { useRenewMutation } from "../../../app/services/auth";
 import {
   setChannels,
@@ -21,8 +21,6 @@ import {
 } from "../../../app/slices/auth.data";
 import { setUsersVersion, setAfterMid } from "../../../app/slices/visit.mark";
 
-// import { addChannelMsg } from "../../../app/slices/message.channel";
-// import { addUserMsg } from "../../../app/slices/message.user";
 import { setReady } from "../../../app/slices/ui";
 import useMessageHandler from "./useMessageHandler";
 const getQueryString = (params = {}) => {
@@ -34,13 +32,15 @@ const getQueryString = (params = {}) => {
   });
   return sp.toString();
 };
-const NotificationHub = ({ usersVersion = 0, afterMid = 0 }) => {
+const NotificationHub = () => {
   const { enableNotification } = useNotification();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token, refreshToken, user: currUser } = useSelector(
-    (store) => store.authData
-  );
+  const {
+    authData: { token, refreshToken, user: currUser },
+  } = useSelector((store) => {
+    return { authData: store.authData };
+  });
   const handleMessage = useMessageHandler(currUser);
   const [
     renewToken,
@@ -53,11 +53,15 @@ const NotificationHub = ({ usersVersion = 0, afterMid = 0 }) => {
   useEffect(() => {
     let sse = null;
     if (token) {
+      const users_version =
+        localStorage.getItem(`${KEY_USER_VERSION}_${currUser.uid}`) ?? 0;
+      const after_mid =
+        localStorage.getItem(`${KEY_AFTER_MID}_${currUser.uid}`) ?? 0;
       sse = new EventSource(
         `${BASE_URL}/user/events?${getQueryString({
           "api-key": token,
-          users_version: usersVersion,
-          after_mid: afterMid,
+          users_version,
+          after_mid,
         })}`
       );
       sse.onopen = () => {
@@ -89,7 +93,7 @@ const NotificationHub = ({ usersVersion = 0, afterMid = 0 }) => {
         sse.close();
       }
     };
-  }, [token, refreshToken, usersVersion, afterMid]);
+  }, [token, refreshToken]);
   useEffect(() => {
     if (refreshTokenSuccess) {
       const { token, refresh_token } = data;

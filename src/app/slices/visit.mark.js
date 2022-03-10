@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import  { KEY_REFRESH_TOKEN, KEY_TOKEN, KEY_UID } from "../config";
+import { KEY_AFTER_MID, KEY_USER_VERSION, KEY_UID } from "../config";
 const initialState = {
   usersVersion: null,
   afterMid: null,
@@ -18,10 +18,14 @@ const visitMarkSlice = createSlice({
     setUsersVersion(state, action) {
       const { version } = action.payload;
       state.usersVersion = version;
+      // const curr_uid = localStorage.getItem(KEY_UID);
+      // localStorage.setItem(`${KEY_USER_VERSION}_${curr_uid}`, version);
     },
     setAfterMid(state, action) {
       const { mid } = action.payload;
       state.afterMid = mid;
+      // const curr_uid = localStorage.getItem(KEY_UID);
+      // localStorage.setItem(`${KEY_AFTER_MID}_${curr_uid}`, mid);
     },
   },
 });

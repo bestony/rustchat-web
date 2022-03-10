@@ -9,6 +9,7 @@ import { IoShareOutline } from "react-icons/io5";
 import styled from "styled-components";
 
 import Avatar from "../../common/component/Avatar";
+import { useSelector } from "react-redux";
 
 const StyledWrapper = styled.div`
   display: flex;
@@ -62,9 +63,10 @@ const StyledWrapper = styled.div`
     }
   }
 `;
-export default function Profile({ data = null, type = "embed" }) {
-  if (!data) return null;
-  const { uid, name, email, avatar } = data;
+export default function Profile({ uid = null, type = "embed" }) {
+  const data = useSelector((s) => s.contacts.byId[uid]);
+  if (!uid) return null;
+  const { name, email, avatar } = data;
   return (
     <StyledWrapper className={type}>
       <Avatar className="avatar" url={avatar} name={name} />

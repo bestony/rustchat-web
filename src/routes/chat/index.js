@@ -49,15 +49,9 @@ export default function ChatPage() {
     listEle.classList.toggle("collapse");
   };
   if (!contacts) return null;
-  const tmpSessionUser = contacts.find((c) => c.uid == user_id);
-  const transformedChannels = Object.entries(channels).map(([key, obj]) => {
-    const unreads = Object.values(ChannelMsgData[key] || {}).filter(
-      (m) => m.unread
-    ).length;
-    return { id: key, ...obj, unreads };
-  });
+  const tmpSessionUser = contacts.byId[user_id];
   const sessions = Object.keys(UserMsgData).map((uid) => {
-    let currUser = contacts.find((c) => c.uid == uid);
+    let currUser = contacts.byId[uid];
     if (!currUser) return undefined;
     let lastMid = Object.keys(UserMsgData[uid]).sort().pop();
     let unreads = Object.values(UserMsgData[uid] || {}).filter((m) => m.unread)
@@ -93,10 +87,7 @@ export default function ChatPage() {
               />
             </h3>
             <nav className="nav">
-              <ChannelList
-                channels={transformedChannels}
-                setDropFiles={setChannelDropFiles}
-              />
+              <ChannelList setDropFiles={setChannelDropFiles} />
             </nav>
           </div>
           <div className="list dms">

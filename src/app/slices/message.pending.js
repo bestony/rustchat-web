@@ -19,6 +19,11 @@ const pendingMessageSlice = createSlice({
       curr[mid] = { ...msg, pending: true };
       state[type][id] = curr;
     },
+    removePendingMessage(state, action) {
+      const { id, mid, type = "user" } = action.payload;
+      console.log("remove msg", type, id, mid);
+      delete state[type][id][mid];
+    },
     setReplyMessage(state, action) {
       const { id, msg } = action.payload;
       console.log("reply to ", id, msg);
@@ -29,11 +34,6 @@ const pendingMessageSlice = createSlice({
       if (state.reply[id]) {
         delete state.reply[id];
       }
-    },
-    removePendingMessage(state, action) {
-      const { id, mid, type = "user" } = action.payload;
-      console.log("remove msg", type, id, mid);
-      delete state[type][id][mid];
     },
   },
 });

@@ -26,7 +26,6 @@ export const msgReaction = (state, payload) => {
     // state[id][mid].likes = currLikes;
   }
 };
-
 export const msgAdd = (state, payload) => {
   const {
     id,

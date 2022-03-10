@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import initCache, { useRehydrate } from "../../app/cache";
+// import initCache, { useRehydrate } from "../../app/cache";
 import { useLazyGetContactsQuery } from "../../app/services/contact";
 import { clearAuthData, setUserData } from "../../app/slices/auth.data";
 import { setContacts } from "../../app/slices/contacts";
@@ -14,7 +14,7 @@ import { KEY_UID } from "../../app/config";
 //   refetchOnMountOrArgChange: true,
 // };
 export default function usePreload() {
-  const { rehydrate, cacheFirst } = useRehydrate();
+  // const { rehydrate, cacheFirst } = useRehydrate();
   const [checked, setChecked] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,10 +36,10 @@ export default function usePreload() {
       data: server,
     },
   ] = useLazyGetServerQuery();
-  useEffect(() => {
-    initCache();
-    rehydrate();
-  }, []);
+  // useEffect(() => {
+  //   initCache();
+  //   // rehydrate();
+  // }, []);
   useEffect(() => {
     getContacts();
     getServer();
@@ -64,7 +64,7 @@ export default function usePreload() {
     }
   }, [contacts]);
   return {
-    loading: contactsLoading || serverLoading || !checked || !cacheFirst,
+    loading: contactsLoading || serverLoading || !checked,
     error: contactsError && serverError,
     success: contactsSuccess && serverSuccess,
     data: {

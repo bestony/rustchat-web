@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  msgReaction,
-  msgAdd,
-  msgSetRead,
-  msgClearUnread,
-  msgUpdate,
-  msgDelete,
-  msgAddPending,
-  msgRemovePending,
-  msgReplacePending,
-} from "./message.handler";
+// import {
+//   msgReaction,
+//   msgAdd,
+//   msgSetRead,
+//   msgClearUnread,
+//   msgUpdate,
+//   msgDelete,
+//   msgAddPending,
+//   msgRemovePending,
+//   msgReplacePending,
+// } from "./message.handler";
 const initialState = {};
 
 const channelMsgSlice = createSlice({
@@ -23,45 +23,47 @@ const channelMsgSlice = createSlice({
       return action.payload;
     },
     addChannelMsg(state, action) {
-      msgAdd(state, action.payload);
+      const { id, mid } = action.payload;
+      if (state[id]) {
+        state[id].push(mid);
+      } else {
+        state[id] = [mid];
+      }
     },
     deleteChannelMsg(state, action) {
-      msgDelete(state, action.payload);
+      const { id, mid } = action.payload;
+      if (state[id]) {
+        delete state[id][mid];
+      }
     },
-    updateChannelMsg(state, action) {
-      msgUpdate(state, action.payload);
+    replaceChannelMsg(state, action) {
+      const { id, local_mid, mid } = action.payload;
+      const local_idx = state[id]?.findIndex((i) => i == local_mid);
+      if (local_idx > -1) {
+        state[id].splice(local_idx, 1, mid);
+      }
     },
-    likeChannelMsg(state, action) {
-      msgReaction(state, action.payload);
-    },
-    setChannelMsgRead(state, action) {
-      msgSetRead(state, action.payload);
-    },
-    clearChannelMsgUnread(state, action) {
-      msgClearUnread(state, action.payload);
-    },
-    addChannelPendingMsg(state, action) {
-      msgAddPending(state, action.payload);
-    },
-    replaceChannelPendingMsg(state, action) {
-      msgReplacePending(state, action.payload);
-    },
-    removeChannelPendingMsg(state, action) {
-      msgRemovePending(state, action.payload);
-    },
+
+    // addChannelPendingMsg(state, action) {
+    //   msgAddPending(state, action.payload);
+    // },
+    // replaceChannelPendingMsg(state, action) {
+    //   msgReplacePending(state, action.payload);
+    // },
+    // removeChannelPendingMsg(state, action) {
+    //   msgRemovePending(state, action.payload);
+    // },
   },
 });
 export const {
-  updateChannelMsg,
   deleteChannelMsg,
-  likeChannelMsg,
   clearChannelMsg,
+  replaceChannelMsg,
   initChannelMsg,
-  clearChannelMsgUnread,
-  setChannelMsgRead,
+  // clearChannelMsgUnread,
   addChannelMsg,
-  addChannelPendingMsg,
-  replaceChannelPendingMsg,
-  removeChannelPendingMsg,
+  // addChannelPendingMsg,
+  // replaceChannelPendingMsg,
+  // removeChannelPendingMsg,
 } = channelMsgSlice.actions;
 export default channelMsgSlice.reducer;

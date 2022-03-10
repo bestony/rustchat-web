@@ -1,20 +1,15 @@
 // import React from "react";
 import {
-  updateChannelMsg,
   addChannelMsg,
   deleteChannelMsg,
-  likeChannelMsg,
 } from "../../../app/slices/message.channel";
-import {
-  updateUserMsg,
-  addUserMsg,
-  deleteUserMsg,
-  likeUserMsg,
-} from "../../../app/slices/message.user";
-import useNotification from "./useNotification";
+import { addUserMsg, deleteUserMsg } from "../../../app/slices/message.user";
+import { updateMsg, addMsg, deleteMsg } from "../../../app/slices/message";
+import { reactMsg } from "../../../app/slices/message.reaction";
+// import useNotification from "./useNotification";
 import { useDispatch } from "react-redux";
 export default function useMessageHandler(currUser) {
-  const { showNotification } = useNotification();
+  // const { showNotification } = useNotification();
   const dispatch = useDispatch();
   const dispatchReaction = ({
     to = "user",
@@ -25,21 +20,21 @@ export default function useMessageHandler(currUser) {
     detail = {},
   }) => {
     const { type = "" } = detail;
-    const updateMsg = to == "user" ? updateUserMsg : updateChannelMsg;
-    const deleteMsg = to == "user" ? deleteUserMsg : deleteChannelMsg;
-    const likeMsg = to == "user" ? likeUserMsg : likeChannelMsg;
+    // const updateMsg = to == "user" ? updateUserMsg : updateMsg;
+    const deleteContextMsg = to == "user" ? deleteUserMsg : deleteChannelMsg;
     switch (type) {
       case "edit":
         {
           const { content } = detail;
-          dispatch(updateMsg({ id, mid, content, time: created_at }));
+          dispatch(updateMsg({ mid, content, time: created_at }));
         }
         break;
       case "like":
-        dispatch(likeMsg({ id, from_uid, mid, action: detail.action }));
+        dispatch(reactMsg({ from_uid, mid, action: detail.action }));
         break;
       case "delete":
-        dispatch(deleteMsg({ id, mid }));
+        dispatch(deleteContextMsg({ id, mid }));
+        dispatch(deleteMsg(mid));
         break;
 
       default:
@@ -47,22 +42,27 @@ export default function useMessageHandler(currUser) {
     }
   };
   const dispatchAddMessage = ({ to = "user", id, self = false, common }) => {
-    const addMessage = to == "user" ? addUserMsg : addChannelMsg;
+    const addContextMessage = to == "user" ? addUserMsg : addChannelMsg;
     dispatch(
-      addMessage({
-        id, // 自己发的 就不用标记未读
+      addMsg({
         unread: !self,
         ...common,
       })
     );
-    if (!self) {
-      showNotification({
-        body: common.content,
-        data: {
-          path: `/chat/${to}/${id}`,
-        },
-      });
-    }
+    dispatch(
+      addContextMessage({
+        id, // 自己发的 就不用标记未读
+        mid: common.mid,
+      })
+    );
+    // if (!self) {
+    //   showNotification({
+    //     body: common.content,
+    //     data: {
+    //       path: `/chat/${to}/${id}`,
+    //     },
+    //   });
+    // }
   };
   const handleMessage = (data) => {
     const { target } = data;
