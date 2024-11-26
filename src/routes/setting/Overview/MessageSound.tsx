@@ -1,31 +1,28 @@
-// import { useEffect } from "react";
-// import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-
 import SettingBlock from "@/components/SettingBlock";
-import StyledRadio from "@/components/styled/Radio";
-import { useAppSelector } from "../../../app/store";
-import { shallowEqual, useDispatch } from "react-redux";
-import { updateMsgSoundSetting } from "@/app/slices/ui";
+import { useTranslation } from "react-i18next";
+import ServerVersionChecker from "@/components/ServerVersionChecker";
+import { KEY_MSG_NOTIFICATION_SOUND } from "@/app/config";
+import useServerExtSetting from "@/hooks/useServerExtSetting";
 import Toggle from "@/components/styled/Toggle";
 
-// type Props = {}
+type Props = {};
 
-const Index = () => {
-  const dispatch = useDispatch();
-  const playSound = useAppSelector((store) => !!store.ui.msgSound, shallowEqual);
+const EnableMsgNotificationSound = ({}: Props) => {
+  const { updateExtSetting, getExtSetting } = useServerExtSetting();
   const { t } = useTranslation("setting", { keyPrefix: "overview.message_sound" });
-  //   const { t: ct } = useTranslation();
-  const toggleEnable = () => {
-    dispatch(updateMsgSoundSetting(!playSound));
+  const enabled = getExtSetting(KEY_MSG_NOTIFICATION_SOUND);
+  const handleToggle = () => {
+    updateExtSetting(KEY_MSG_NOTIFICATION_SOUND, !enabled);
   };
   return (
-    <SettingBlock
-      title={t("title")}
-      desc={t("desc")}
-      toggler={<Toggle onClick={toggleEnable} checked={playSound} />}
-    ></SettingBlock>
+    <ServerVersionChecker empty version="0.3.50">
+      <SettingBlock
+        title={t("title")}
+        desc={t("desc")}
+        toggler={<Toggle onClick={handleToggle} checked={enabled} />}
+      ></SettingBlock>
+    </ServerVersionChecker>
   );
 };
 
-export default Index;
+export default EnableMsgNotificationSound;

@@ -4,8 +4,10 @@ import dayjs from "dayjs";
 import useStreaming from "@/hooks/useStreaming";
 import { useAppSelector } from "../app/store";
 import { shallowEqual } from "react-redux";
+import { useGetSystemCommonQuery } from "@/app/services/server";
 
 export default function useSSE() {
+  useGetSystemCommonQuery();
   const loginUid = useAppSelector((store) => store.authData.user?.uid, shallowEqual);
   const token = useAppSelector((store) => store.authData.token, shallowEqual);
   const expireTime = useAppSelector(

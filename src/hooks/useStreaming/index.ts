@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { isNull, omitBy } from "lodash";
 
-import BASE_URL from "@/app/config";
+import BASE_URL, { KEY_MSG_NOTIFICATION_SOUND } from "@/app/config";
 import { useRenewMutation } from "@/app/services/auth";
 import { resetAuthData, updateLoginUser, updateRoleChanged } from "@/app/slices/auth.data";
 import {
@@ -46,6 +46,7 @@ import {
 import { getLocalAuthData, isElectronContext } from "@/utils";
 import chatMessageHandler from "./chat.handler";
 import { shallowEqual } from "react-redux";
+import useServerExtSetting from "../useServerExtSetting";
 
 const getQueryString = (params: { [key: string]: string }) => {
   const sp = new URLSearchParams();
@@ -62,6 +63,7 @@ let ready = false; //是否已完成初始推送
 let aliveInter: number | ReturnType<typeof setTimeout> = 0;
 const isTabHidden = () => (isElectronContext() ? document.webkitHidden : document.hidden);
 export default function useStreaming() {
+  const { getExtSetting } = useServerExtSetting();
   const [renewToken] = useRenewMutation();
   const user = useAppSelector((store) => store.authData.user, shallowEqual);
   const guest = useAppSelector((store) => store.authData.guest, shallowEqual);
@@ -404,12 +406,14 @@ export default function useStreaming() {
           dispatch(updatePinMessage(data));
           break;
         case "chat": {
+          const enableMsgSound = getExtSetting(KEY_MSG_NOTIFICATION_SOUND);
           chatMessageHandler(data, dispatch, {
             afterMid: window.AFTER_MID ?? 0,
             ready,
             loginUid,
             readUsers,
-            readChannels
+            readChannels,
+            enableMsgSound
           });
           break;
         }

@@ -21,6 +21,7 @@ type CurrentState = {
   readChannels: {
     [key: number]: number;
   };
+  enableMsgSound: boolean;
 };
 const handler = (
   data: ChatEvent,
@@ -51,7 +52,7 @@ const handler = (
     properties,
     expires_in
   };
-  const { loginUid, readUsers = {}, readChannels = {}, ready } = currState;
+  const { loginUid, readUsers = {}, readChannels = {}, ready, enableMsgSound } = currState;
   if (!fromHistory) {
     // 如果来自历史消息的拉取，则忽略更新 after mid
     switch (type) {
@@ -65,7 +66,8 @@ const handler = (
         }
         break;
     }
-    if (loginUid != common.from_uid && ready && window.MSG_SOUND) {
+    // todo msg sound
+    if (loginUid != common.from_uid && ready && enableMsgSound) {
       // 已ready，来自SSE的非自己的消息推送
       playMessageSound();
     }
@@ -98,7 +100,7 @@ const handler = (
         // }
       });
       // 推给 PC 端
-      console.info("{{NEW_MSG}}")
+      console.info("{{NEW_MSG}}");
       break;
     }
     case "reply":
